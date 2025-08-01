@@ -1,0 +1,65 @@
+services:
+  # Database Service (PostgreSQL)
+  # This database will be used by both Gitea and our web application.
+  postgres_db:
+    image: postgres:14-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: admin  # Q1 requirement: username as "admin"
+      POSTGRES_PASSWORD: 2301769@sit.singaporetech.edu.sg # Q1 requirement: password as your SIT email
+      POSTGRES_DB: gitea_db # Default database for Gitea to use
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck: # <-- ADD THIS BLOCK
+      test: ["CMD-SHELL", "pg_isready -U admin -d gitea_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Git Server Service (Gitea)
+  # This provides a local, self-hosted Git server like GitHub.
+  git_server:
+    image: gitea/gitea:latest
+    container_name: git_server
+    depends_on:
+      - postgres_db
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=postgres_db:5432
+      - GITEA__database__NAME=gitea_db
+      - GITEA__database__USER=admin
+      - GITEA__database__PASSWD=2301769@sit.singaporetech.edu.sg
+    volumes:
+      - ./gitea-data:/data
+    ports:
+      - "3000:3000"   # Gitea Web UI
+      - "2222:22"     # Gitea SSH Port (mapped to 2222 to avoid conflicts)
+    restart: always
+
+  # Web Application Service (Your Flask App)
+  # This is the "webserver" container from Q1, which will run the app from Q4.
+    # Web Application Service (Your Flask App)
+  web_app:
+    container_name: web_app
+    build: ./webapp 
+    depends_on:
+      postgres_db: # <-- This now waits for the healthcheck to pass
+        condition: service_healthy
+    environment:
+      # Pass database connection details to our application
+      DB_HOST: postgres_db
+      DB_NAME: gitea_db # <-- THIS IS THE FIX
+      DB_USER: admin
+      DB_PASS: 2301769@sit.singaporetech.edu.sg
+    ports:
+      - "80:5000" 
+    restart: always
+
+volumes:
+  postgres-data:
+  gitea-data:

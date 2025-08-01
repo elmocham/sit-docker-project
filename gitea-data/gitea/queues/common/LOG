@@ -1,0 +1,6 @@
+=============== Aug 1, 2025 (UTC) ===============
+08:13:33.775561 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+08:13:33.811390 db@open opening
+08:13:33.821674 version@stat F·[] S·0B[] Sc·[]
+08:13:33.840751 db@janitor F·2 G·0
+08:13:33.841439 db@open done T·28.917028ms

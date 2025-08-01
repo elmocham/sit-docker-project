@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ session.username }}!</h1>
+    
+    <!-- Q4(d) & Q4(g): Display the session ID -->
+    <p>Your unique session ID is: <strong>{{ session_id }}</strong></p>
+    <p>You will be automatically logged out after 1 minute of inactivity.</p>
+    
+    <!-- Q4(d) & Q4(f): Logout button -->
+    <a href="/logout"><button>Logout</button></a>
+</body>
+</html>
