@@ -1,6 +1,5 @@
 name: CI Pipeline
 
-# Trigger the workflow on pushes to the master/main branch and on pull requests
 on:
   push:
     branches: [ master, main ]
@@ -9,56 +8,49 @@ on:
 
 jobs:
   build-and-test:
-    # Use the latest version of Ubuntu to run the job
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      # Step 3: Install dependencies for scanning and testing
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r webapp/requirements.txt
-          pip install safety bandit # Install both scanning tools
+          pip install safety bandit
 
-      # Step 4: (Q5) Dependency Vulnerability Check
+      # FIX: Using the modern 'scan' command instead of the deprecated 'check'
       - name: Scan dependencies for vulnerabilities
-        run: safety check -r webapp/requirements.txt
+        run: safety scan -r webapp/requirements.txt
 
-      # Step 5: (Q6) Python Security Scan with Bandit
       - name: Run security linter (Bandit)
-        run: bandit -r webapp/ -ll # Scan the webapp folder, show medium+ level issues
+        run: bandit -r webapp/ -ll
 
-      # Step 6: (Q5) Run services for Integration and UI Testing
+      # FIX: Using 'docker compose' (with a space)
       - name: Start services with Docker Compose
-        run: docker-compose up --build -d
+        run: docker compose up --build -d
 
-      # Step 7: Wait for services to be ready
       - name: Wait for Web App to be healthy
         run: |
           echo "Waiting for services to start... (max 60s)"
           timeout 60s bash -c 'until curl --fail http://localhost:80; do sleep 5; done'
           echo "Web app is up!"
 
-      # Step 8: (Q5) Run UI Test over HTTP
       - name: Run UI Test with Selenium
         run: python tests/test_ui.py
       
-      # Step 9: Capture logs on failure for easier debugging
+      # FIX: Using 'docker compose' (with a space)
       - name: Get Docker logs if test failed
         if: failure()
-        run: docker-compose logs
+        run: docker compose logs
 
-      # Step 10: Stop services to clean up the runner
+      # FIX: Using 'docker compose' (with a space)
       - name: Stop services
-        if: always() # This step should run even if previous steps fail
-        run: docker-compose down
+        if: always()
+        run: docker compose down

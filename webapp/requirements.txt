@@ -1,5 +1,10 @@
-Flask==2.2.2
-Werkzeug==2.2.2
+# We update Flask and Werkzeug to patched versions that are still compatible.
+Flask==2.2.5
+Werkzeug==2.3.8
+
+# We update Selenium to a much newer version as requested by the scanner.
+selenium==4.18.1
+
+# These packages had no reported vulnerabilities, so they can stay.
 psycopg2-binary==2.9.5
 bcrypt==4.0.1
-selenium==4.8.0 # <-- ADD THIS LINE
